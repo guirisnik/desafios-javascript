@@ -17,6 +17,15 @@
  * a > b sempre.
  */
 
-const MDC = (a, b) => {}
+function remainderOf(numerator = 1, denominator = 1) {
+  return numerator % denominator
+}
+
+function MDC(a, b) {
+  if (a == 0) return b
+  if (b == 0) return a
+
+  return a > b ? MDC(b, remainderOf(a, b)) : MDC(a, remainderOf(b, a))
+}
 
 module.exports = MDC

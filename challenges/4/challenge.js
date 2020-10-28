@@ -52,6 +52,38 @@
  *  }
  */
 
-const normalizeData = unormalized => {}
+const { normalize, schema } = require('normalizr')
+
+function normalizeData(unormalized) {
+  const userSchema = new schema.Entity('users')
+  const reportSchema = new schema.Entity(
+    'reports',
+    {},
+    {
+      processStrategy: function (value, parent) {
+        const {
+          id,
+          result: { document, status },
+        } = value
+        const { user: userId } = parent
+        return {
+          id,
+          document,
+          status,
+          user: userId,
+        }
+      },
+    },
+  )
+  const reportArraySchema = new schema.Array(reportSchema)
+  const resultsSchema = new schema.Entity('results', {
+    user: userSchema,
+    reports: reportArraySchema,
+  })
+
+  const { entities } = normalize(unormalized, resultsSchema)
+
+  return entities
+}
 
 module.exports = normalizeData
